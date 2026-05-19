@@ -17,17 +17,23 @@
           <strong>MeowResume</strong>
           <span id="statusText">所有内容只保存在你的浏览器里</span>
         </div>
-        <div class="top-actions">
-          <a class="ghost link-button" href="./">项目介绍</a>
-          <button class="ghost" id="loadSampleBtn" type="button">载入示例</button>
-          <button class="ghost" id="saveBtn" type="button">保存当前版本</button>
-          <button class="ghost" id="saveAsBtn" type="button">另存为新版本</button>
-          <button class="ghost" id="exportJsonBtn" type="button">导出 JSON</button>
-          <label class="ghost file-button">
-            导入 JSON
-            <input id="importJsonInput" type="file" accept="application/json,.json" />
-          </label>
-          <button class="primary" id="generateBtn" type="button">生成 Word</button>
+        <div class="top-actions" aria-label="主要操作">
+          <div class="action-group">
+            <a class="btn secondary link-button" href="./">项目介绍</a>
+            <button class="btn secondary" id="loadSampleBtn" type="button">载入示例</button>
+          </div>
+          <div class="action-group save-group">
+            <button class="btn save" id="saveBtn" type="button">保存当前版本</button>
+            <button class="btn secondary" id="saveAsBtn" type="button">另存为新版本</button>
+          </div>
+          <div class="action-group">
+            <button class="btn secondary compact" id="exportJsonBtn" type="button">导出 JSON</button>
+            <label class="btn secondary compact file-button">
+              导入 JSON
+              <input id="importJsonInput" type="file" accept="application/json,.json" />
+            </label>
+            <button class="btn primary" id="generateBtn" type="button">生成 Word</button>
+          </div>
         </div>
       </header>
 

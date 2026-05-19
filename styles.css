@@ -34,31 +34,88 @@ select {
 button,
 .file-button,
 .link-button {
-  min-height: 34px;
-  border: 1px solid var(--line);
-  border-radius: 6px;
+  font: inherit;
+}
+
+.btn {
+  height: 34px;
+  min-width: 76px;
+  border: 1px solid transparent;
+  border-radius: 7px;
   padding: 0 12px;
-  background: var(--panel);
-  color: var(--ink);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
   white-space: nowrap;
   text-decoration: none;
+  box-shadow: 0 1px 1px rgba(20, 32, 26, 0.03);
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.08s ease;
 }
 
-button:hover,
-.file-button:hover,
-.link-button:hover {
+.btn:hover {
   border-color: var(--line-strong);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn:focus-visible {
+  outline: 2px solid rgba(22, 122, 85, 0.32);
+  outline-offset: 2px;
+}
+
+.secondary {
+  background: #fff;
+  border-color: var(--line);
+  color: #36413b;
+  font-weight: 650;
+}
+
+.secondary:hover {
+  background: #f8faf9;
+  color: var(--ink);
+}
+
+.save {
+  background: var(--soft);
+  border-color: #b8d8c8;
+  color: var(--accent-dark);
+  min-width: 112px;
+}
+
+.save:hover {
+  background: #dff0e7;
+  border-color: #8fc7aa;
 }
 
 .primary {
   background: var(--accent);
   border-color: var(--accent);
   color: #fff;
+  min-width: 106px;
+  padding-inline: 16px;
+  box-shadow: 0 8px 18px rgba(22, 122, 85, 0.2);
+}
+
+.primary:hover {
+  background: var(--accent-dark);
+  border-color: var(--accent-dark);
+}
+
+.compact {
+  min-width: 84px;
+  padding-inline: 10px;
+  font-size: 13px;
 }
 
 .danger {
@@ -110,8 +167,25 @@ button:hover,
 .top-actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   justify-content: flex-end;
-  gap: 8px;
+  gap: 10px;
+}
+
+.action-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px;
+  border: 1px solid #e1e6e3;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.76);
+  box-shadow: 0 1px 2px rgba(20, 32, 26, 0.04);
+}
+
+.save-group {
+  border-color: #d5e7dd;
+  background: #f8fcfa;
 }
 
 .workspace {
@@ -427,8 +501,22 @@ select:focus {
 
   .top-actions {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
     justify-content: stretch;
+  }
+
+  .action-group {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .action-group:last-child {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .action-group:last-child .primary {
+    grid-column: 1 / -1;
   }
 
   .workspace {
