@@ -32,7 +32,8 @@ select {
 }
 
 button,
-.file-button {
+.file-button,
+.link-button {
   min-height: 34px;
   border: 1px solid var(--line);
   border-radius: 6px;
@@ -45,10 +46,12 @@ button,
   justify-content: center;
   font-weight: 700;
   white-space: nowrap;
+  text-decoration: none;
 }
 
 button:hover,
-.file-button:hover {
+.file-button:hover,
+.link-button:hover {
   border-color: var(--line-strong);
 }
 
