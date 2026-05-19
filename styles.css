@@ -35,14 +35,12 @@ button,
 .file-button,
 .link-button {
   font: inherit;
-}
-
-.btn {
   height: 34px;
-  min-width: 76px;
-  border: 1px solid transparent;
+  border: 1px solid var(--line);
   border-radius: 7px;
   padding: 0 12px;
+  background: var(--panel);
+  color: var(--ink);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -61,17 +59,33 @@ button,
     transform 0.08s ease;
 }
 
-.btn:hover {
+button:hover,
+.file-button:hover,
+.link-button:hover {
   border-color: var(--line-strong);
+  background: #f8faf9;
 }
 
-.btn:active {
+button:active,
+.file-button:active,
+.link-button:active {
   transform: translateY(1px);
 }
 
-.btn:focus-visible {
+button:focus-visible,
+.file-button:focus-visible,
+.link-button:focus-visible {
   outline: 2px solid rgba(22, 122, 85, 0.32);
   outline-offset: 2px;
+}
+
+.btn {
+  min-width: 76px;
+  border: 1px solid transparent;
+}
+
+.btn:hover {
+  border-color: var(--line-strong);
 }
 
 .secondary {
@@ -120,6 +134,13 @@ button,
 
 .danger {
   color: var(--danger);
+  border-color: #e7b9b4;
+  background: #fffdfc;
+}
+
+.danger:hover {
+  border-color: #d98d86;
+  background: #fff5f3;
 }
 
 .file-button input {
