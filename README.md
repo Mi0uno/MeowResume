@@ -9,7 +9,7 @@ _填写结构化内容，预览标准简历版式，一键生成 ATS 友好的 `
 ![Local First](https://img.shields.io/badge/Local--first-No%20cloud%20upload-2ea44f?style=flat-square)
 ![Tests](https://img.shields.io/badge/tests-unittest-brightgreen?style=flat-square)
 
-[项目主页](https://mi0uno.github.io/MeowResume/) · [快速开始](#快速开始) · [数据结构](#数据结构) · [本地-api](#本地-api)
+[在线使用](https://mi0uno.github.io/MeowResume/) · [本地运行](#本地运行) · [数据结构](#数据结构) · [本地-api](#本地-api)
 
 ## 项目概述
 
@@ -18,7 +18,7 @@ _填写结构化内容，预览标准简历版式，一键生成 ATS 友好的 `
 > 目标是让 HR、ATS 系统和一线面试官在 10 秒内读到重点：学校、岗位匹配度、项目职责、量化成果和硬核证书。
 
 > [!IMPORTANT]
-> MeowResume 默认在本地运行。真实简历、证件照、历史版本和生成的 Word 文件会被 `.gitignore` 排除，公开仓库只保留代码、文档和示例数据。
+> 在线版直接运行在浏览器里，真实简历不会上传到服务器。仓库里的真实简历、证件照、历史版本和生成的 Word 文件也会被 `.gitignore` 排除。
 
 ## 核心能力
 
@@ -52,7 +52,25 @@ _填写结构化内容，预览标准简历版式，一键生成 ATS 友好的 `
 
 Word 输出遵循保守、清晰、可解析的中文校招简历格式：A4 页面、单栏正文、紧凑行距、标题下划线、经历 bullet 化、奖项和证书左右对齐。
 
-## 快速开始
+## 在线直接使用
+
+打开 GitHub Pages：
+
+```text
+https://mi0uno.github.io/MeowResume/
+```
+
+在线版能力：
+
+- 直接在网页里填写简历内容。
+- 浏览器本地保存草稿和历史版本。
+- 一键生成 `.docx` Word 简历。
+- 支持导入/导出 JSON，方便跨浏览器迁移。
+- 不依赖后端服务，不上传真实简历数据。
+
+在线版为了保持纯静态部署，暂不把真实照片嵌入 Word，只保留证件照占位。需要真实照片嵌入、Python 版严格模板和本地 API 时，使用下面的本地运行方式。
+
+## 本地运行
 
 ### 前置要求
 
