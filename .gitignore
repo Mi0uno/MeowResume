@@ -1,0 +1,34 @@
+# Runtime and cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Local server state
+.web_server.pid
+web_server.out.log
+web_server.err.log
+
+# Private resume data and generated artifacts
+data/
+output/
+*.docx
+
+# Personal drafts
+liang_songtao_resume*.json
+*_resume_delivery.json
+*_resume_v*.json
+
+# Local environment
+.env
+.venv/
+venv/
+env/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+Desktop.ini
+.idea/
+.vscode/

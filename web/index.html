@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>简历生成器</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <div class="brand-title">
+            <strong>简历生成器</strong>
+            <span id="draftMeta"></span>
+          </div>
+          <span id="saveState" class="save-state">已载入</span>
+        </div>
+        <div class="top-actions">
+          <button class="ghost" id="loadSampleBtn" type="button">载入示例</button>
+          <button class="ghost" id="analyzeBtn" type="button">检查质量</button>
+          <button class="ghost" id="saveVersionBtn" type="button">保存版本</button>
+          <button class="primary" id="generateBtn" type="button">生成 Word</button>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <aside class="section-nav" id="sectionNav" aria-label="简历模块"></aside>
+
+        <section class="editor-pane" aria-label="内容编辑">
+          <div id="sectionBody"></div>
+        </section>
+
+        <aside class="preview-pane" aria-label="简历预览">
+          <div class="preview-header">
+            <strong id="previewName">姓名</strong>
+            <span id="previewRole">目标岗位</span>
+          </div>
+          <div class="preview-contact" id="previewContact"></div>
+          <div class="quality-box" id="qualityBox"></div>
+          <div class="preview-document" id="previewDocument"></div>
+        </aside>
+      </main>
+    </div>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

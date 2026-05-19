@@ -1,0 +1,160 @@
+{
+  "basics": {
+    "name": "张三",
+    "target_role": "后端开发工程师",
+    "phone": "138-0000-0000",
+    "email": "zhangsan@example.com",
+    "city": "北京",
+    "photo": {
+      "enabled": true,
+      "path": ""
+    },
+    "links": [
+      {
+        "label": "GitHub",
+        "url": "https://github.com/example"
+      },
+      {
+        "label": "作品集",
+        "url": "https://example.com"
+      }
+    ]
+  },
+  "education": [
+    {
+      "school": "清华大学",
+      "degree": "本科",
+      "major": "计算机科学与技术",
+      "start": "2022.09",
+      "end": "2026.06",
+      "gpa": "3.82/4.00",
+      "rank": "专业前 10%",
+      "courses": [
+        "数据结构",
+        "操作系统",
+        "计算机网络",
+        "数据库系统",
+        "软件工程"
+      ],
+      "honors": [
+        "国家奖学金",
+        "校级优秀学生干部"
+      ]
+    }
+  ],
+  "skills": {
+    "编程语言": [
+      "Python",
+      "Java",
+      "Go",
+      "SQL"
+    ],
+    "后端与中间件": [
+      "FastAPI",
+      "Spring Boot",
+      "Redis",
+      "MySQL",
+      "Kafka"
+    ],
+    "工程与部署": [
+      "Linux",
+      "Docker",
+      "Git",
+      "CI/CD"
+    ]
+  },
+  "experience": [
+    {
+      "organization": "字节跳动",
+      "role": "后端开发实习生",
+      "location": "北京",
+      "start": "2025.07",
+      "end": "2025.10",
+      "content": "参与内容审核任务分发与稳定性建设，围绕任务领取、消费失败、接口超时等核心链路进行优化",
+      "responsibilities": [
+        "重构内容审核任务分发接口，基于 Redis Stream 与批量写入减少重复查询",
+        "设计 12 项核心埋点与异常告警规则，覆盖任务积压、消费失败和接口超时场景",
+        "补充单元测试与集成测试，覆盖高并发领取、重复提交和回滚路径"
+      ],
+      "results": [
+        "接口 P95 延迟从 420ms 降至 260ms，平均定位时间缩短约 35%",
+        "模块行覆盖率提升至 86%"
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "校园二手交易平台",
+      "role": "后端负责人",
+      "technologies": [
+        "FastAPI",
+        "MySQL",
+        "Redis",
+        "Docker"
+      ],
+      "start": "2025.03",
+      "end": "2025.06",
+      "content": "面向校内二手交易场景，完成商品发布、搜索、订单和消息等核心模块开发",
+      "responsibilities": [
+        "主导商品发布、搜索、订单和消息 4 个核心模块设计",
+        "引入 Redis 缓存热门商品与搜索结果，优化首页和搜索接口响应",
+        "用 Docker Compose 固化本地与测试环境，编写部署脚本"
+      ],
+      "results": [
+        "支撑 1200+ 名校内用户完成 3500+ 次商品浏览",
+        "首页接口平均响应时间从 310ms 降至 95ms，数据库读请求减少 62%",
+        "新成员环境搭建时间从半天缩短到 20 分钟"
+      ]
+    },
+    {
+      "name": "CTF 自动化解题辅助工具",
+      "role": "核心开发",
+      "technologies": [
+        "Python",
+        "Playwright",
+        "SQLite"
+      ],
+      "start": "2024.10",
+      "end": "2025.01",
+      "content": "围绕 CTF 训练和赛后复盘流程，开发题目抓取、附件归档和 Writeup 模板生成工具",
+      "responsibilities": [
+        "实现题目抓取、附件归档和 Writeup 模板生成流程，覆盖 Web、Crypto、Misc 等 6 类题型",
+        "封装常见编码、弱口令探测和目录扫描能力，形成可复用插件"
+      ],
+      "results": [
+        "沉淀 18 个复用插件，使赛后复盘整理耗时降低约 50%"
+      ]
+    }
+  ],
+  "awards": [
+    {
+      "name": "2025 年全国大学生信息安全竞赛华北赛区",
+      "level": "一等奖",
+      "date": "2025.08",
+      "content": "参加区域赛攻防与解题任务，覆盖 Web、Crypto、Misc 等方向",
+      "responsibilities": [
+        "负责 Web 方向漏洞分析、自动化脚本编写和赛后 Writeup 整理"
+      ],
+      "results": [
+        "团队获得华北赛区一等奖"
+      ]
+    },
+    {
+      "name": "2024 年蓝桥杯 Python 组",
+      "level": "省级一等奖",
+      "date": "2024.04",
+      "content": "",
+      "responsibilities": [
+        "完成算法设计、边界条件分析和代码实现"
+      ],
+      "results": [
+        "获得省级一等奖"
+      ]
+    },
+    "2024 年校级优秀共青团员"
+  ],
+  "certifications": [
+    "大学英语六级 CET-6 532",
+    "华为 HCIA-Datacom"
+  ]
+}
