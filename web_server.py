@@ -115,6 +115,7 @@ def summarize_version(version: JSONDict) -> JSONDict:
     return {
         "id": version["id"],
         "created_at": version["created_at"],
+        "updated_at": version.get("updated_at", ""),
         "title": version.get("title", ""),
         "name": version.get("name", ""),
         "target_role": version.get("target_role", ""),
@@ -181,6 +182,7 @@ def save_resume_version(
     version = {
         "id": version_id,
         "created_at": created_at,
+        "updated_at": "",
         "title": ensure_unique_title(title_text, library),
         "name": basics.get("name", ""),
         "target_role": basics.get("target_role", ""),
@@ -193,6 +195,54 @@ def save_resume_version(
     prune_library(library, photo_root=photo_root)
     write_library(library, library_path)
     return version
+
+
+def update_resume_version(
+    version_id: str,
+    data: JSONDict,
+    jd_text: str = "",
+    title: str = "",
+    photo_path: Path | None = None,
+    library_path: Path = LIBRARY_FILE,
+    photo_root: Path = PHOTO_ROOT,
+) -> JSONDict:
+    errors = validate_payload(data)
+    if errors:
+        raise PayloadValidationError(errors)
+
+    library = load_library(library_path)
+    for index, version in enumerate(library["versions"]):
+        if version.get("id") != version_id:
+            continue
+
+        resume_data = copy.deepcopy(data)
+        if photo_path is not None:
+            delete_version_photo(version, photo_root)
+            stored_photo = persist_photo(photo_path, version_id, photo_root)
+            resume_data = merge_photo_upload(resume_data, stored_photo)
+
+        basics = resume_data.get("basics", {})
+        education = resume_data.get("education") or []
+        school = education[0].get("school", "") if education else ""
+        updated_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
+        version["updated_at"] = updated_at
+        version["title"] = title.strip() or version.get("title") or build_version_title(
+            basics,
+            version.get("created_at", updated_at),
+            school=school,
+            version_number=index + 1,
+        )
+        version["name"] = basics.get("name", "")
+        version["target_role"] = basics.get("target_role", "")
+        version["school"] = school
+        version["jd"] = jd_text
+        version["data"] = resume_data
+        if index:
+            library["versions"].insert(0, library["versions"].pop(index))
+        write_library(library, library_path)
+        return version
+
+    raise NotFoundError(f"版本不存在: {version_id}")
 
 
 def build_version_id() -> str:
@@ -393,8 +443,17 @@ class ResumeAppHandler(BaseHTTPRequestHandler):
     def handle_save_version(self) -> None:
         try:
             with tempfile.TemporaryDirectory() as temp_dir:
-                data, jd_text, title, photo_path = self.read_save_form(Path(temp_dir))
-                version = save_resume_version(data, jd_text=jd_text, title=title, photo_path=photo_path)
+                data, jd_text, title, photo_path, version_id = self.read_save_form(Path(temp_dir))
+                if version_id:
+                    version = update_resume_version(
+                        version_id,
+                        data,
+                        jd_text=jd_text,
+                        title=title,
+                        photo_path=photo_path,
+                    )
+                else:
+                    version = save_resume_version(data, jd_text=jd_text, title=title, photo_path=photo_path)
                 self.send_json({
                     "ok": True,
                     "version": summarize_version(version),
@@ -402,6 +461,8 @@ class ResumeAppHandler(BaseHTTPRequestHandler):
                 })
         except PayloadValidationError as exc:
             self.send_json({"ok": False, "errors": exc.errors}, status=400)
+        except NotFoundError as exc:
+            self.send_json({"ok": False, "errors": [str(exc)]}, status=404)
         except Exception as exc:
             self.send_json({"ok": False, "errors": [str(exc)]}, status=500)
 
@@ -442,19 +503,20 @@ class ResumeAppHandler(BaseHTTPRequestHandler):
 
         return data, jd_text, photo_path, no_photo
 
-    def read_save_form(self, temp_dir: Path) -> tuple[JSONDict, str, str, Path | None]:
+    def read_save_form(self, temp_dir: Path) -> tuple[JSONDict, str, str, Path | None, str]:
         content_type = self.headers.get("Content-Type", "")
         if "multipart/form-data" not in content_type:
             payload = self.read_json_body()
-            return payload["data"], payload.get("jd", ""), payload.get("title", ""), None
+            return payload["data"], payload.get("jd", ""), payload.get("title", ""), None, payload.get("version_id", "")
 
         form = self.read_multipart_form(content_type)
         raw_data = form.getfirst("data", "{}")
         data = json.loads(raw_data)
         jd_text = form.getfirst("jd", "")
         title = form.getfirst("title", "")
+        version_id = form.getfirst("version_id", "")
         photo_path = self.extract_photo_upload(form, temp_dir)
-        return data, jd_text, title, photo_path
+        return data, jd_text, title, photo_path, version_id
 
     def read_multipart_form(self, content_type: str) -> cgi.FieldStorage:
         return cgi.FieldStorage(

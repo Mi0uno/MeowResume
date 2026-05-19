@@ -323,6 +323,20 @@ textarea {
   font-weight: 700;
 }
 
+.entry-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.hint {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
 .inline-controls {
   display: flex;
   gap: 8px;
@@ -493,6 +507,11 @@ textarea {
 .version-item:hover {
   border-color: var(--border-strong);
   background: var(--surface);
+}
+
+.version-item.active {
+  border-color: #9bcdb6;
+  background: #f3fbf7;
 }
 
 .version-main {

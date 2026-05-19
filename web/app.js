@@ -80,6 +80,7 @@ let state = {
   photoFile: null,
   versionTitle: "",
   lastSavedTitle: "",
+  currentVersionId: "",
   busy: "",
   library: { settings: { max_versions: 30 }, versions: [] },
   quality: { errors: [], warnings: [] },
@@ -98,6 +99,7 @@ const qualityBox = document.getElementById("qualityBox");
 document.getElementById("loadSampleBtn").addEventListener("click", loadSample);
 document.getElementById("analyzeBtn").addEventListener("click", analyzeResume);
 document.getElementById("saveVersionBtn").addEventListener("click", saveVersion);
+document.getElementById("saveAsVersionBtn").addEventListener("click", () => saveVersion({ asNew: true }));
 document.getElementById("generateBtn").addEventListener("click", generateWord);
 
 init();
@@ -111,6 +113,7 @@ async function init() {
       state.jd = parsed.jd || "";
       state.versionTitle = parsed.versionTitle || "";
       state.lastSavedTitle = parsed.lastSavedTitle || "";
+      state.currentVersionId = parsed.currentVersionId || "";
     } catch {
       await loadSample();
       return;
@@ -130,6 +133,7 @@ async function loadSample() {
   state.jd = "";
   state.photoFile = null;
   state.versionTitle = "";
+  state.currentVersionId = "";
   state.quality = { errors: [], warnings: [] };
   ensureShape();
   await loadLibrary();
@@ -205,15 +209,17 @@ function renderTopbar() {
   draftMeta.textContent = buildDraftMeta();
   document.getElementById("analyzeBtn").disabled = state.busy === "analyze";
   document.getElementById("saveVersionBtn").disabled = state.busy === "save";
+  document.getElementById("saveAsVersionBtn").disabled = state.busy === "save";
   document.getElementById("generateBtn").disabled = state.busy === "generate";
   document.getElementById("analyzeBtn").textContent = state.busy === "analyze" ? "检查中" : "检查质量";
-  document.getElementById("saveVersionBtn").textContent = state.busy === "save" ? "保存中" : "保存版本";
+  document.getElementById("saveVersionBtn").textContent = state.busy === "save" ? "保存中" : (state.currentVersionId ? "保存当前版本" : "保存新版本");
+  document.getElementById("saveAsVersionBtn").textContent = state.busy === "save" ? "保存中" : "另存为新版本";
   document.getElementById("generateBtn").textContent = state.busy === "generate" ? "生成中" : "生成 Word";
 }
 
 function buildDraftMeta() {
   const basics = state.data?.basics || {};
-  const values = [basics.name, basics.target_role, state.jd ? "含 JD" : ""].filter(Boolean);
+  const values = [basics.name, basics.target_role, state.currentVersionId ? "编辑历史版本" : "", state.jd ? "含 JD" : ""].filter(Boolean);
   return values.join(" / ");
 }
 
@@ -517,23 +523,27 @@ function renderJd() {
 function renderLibrary() {
   const library = state.library || { settings: { max_versions: 30 }, versions: [] };
   const versions = library.versions || [];
-  const nextTitle = buildNextVersionTitle();
+  const saveTarget = buildSaveTargetTitle();
   return `
     ${sectionHeader("简历库", `<button class="small" data-action="refresh-library" type="button">刷新</button>`)}
     <div class="entry-list">
       <div class="entry">
         <div class="entry-head">
-          <span>保存当前版本</span>
-          <button class="small" data-action="save-version" type="button">保存版本</button>
+          <span>${state.currentVersionId ? "保存当前编辑版本" : "保存新版本"}</span>
+          <div class="entry-actions">
+            <button class="small" data-action="save-version" type="button">保存当前版本</button>
+            <button class="small" data-action="save-as-version" type="button">另存为新版本</button>
+          </div>
         </div>
         <div class="save-preview">
-          <span>下一次保存名</span>
-          <strong id="nextVersionTitle">${escapeHtml(nextTitle)}</strong>
+          <span>${state.currentVersionId ? "当前编辑" : "保存后将创建"}</span>
+          <strong id="nextVersionTitle">${escapeHtml(saveTarget)}</strong>
         </div>
         <div class="form-grid">
-          ${field("版本标题前缀", "versionTitle", state.versionTitle || "", "留空则使用姓名/岗位/学校")}
+          ${field("版本标题前缀", "versionTitle", state.versionTitle || "", state.currentVersionId ? "留空则沿用当前版本名" : "留空则使用姓名/岗位/学校")}
           ${field("最大留存数量", "library.settings.max_versions", library.settings?.max_versions || 30)}
         </div>
+        <p class="hint">保存当前版本会覆盖正在编辑的历史版本；只有“另存为新版本”才会新增一条历史。</p>
         ${state.lastSavedTitle ? `<div class="save-confirm">最近保存：${escapeHtml(state.lastSavedTitle)}</div>` : ""}
       </div>
       <div class="entry">
@@ -550,16 +560,17 @@ function renderLibrary() {
 
 function renderVersionItem(version, index) {
   const tags = [
+    version.id === state.currentVersionId ? "正在编辑" : "",
     version.has_jd ? "JD" : "",
     version.has_photo ? "照片" : "",
   ].filter(Boolean);
   const displayTitle = buildVersionDisplayTitle(version, index);
   return `
-    <div class="version-item">
+    <div class="version-item ${version.id === state.currentVersionId ? "active" : ""}">
       <div class="version-main">
         <strong>${escapeHtml(displayTitle)}</strong>
         <span>${escapeHtml([version.name, version.target_role, version.school].filter(Boolean).join(" | "))}</span>
-        <small>${escapeHtml(formatTime(version.created_at))}</small>
+        <small>${escapeHtml(formatVersionTimes(version))}</small>
       </div>
       <div class="version-tags">${tags.map((tag) => `<span>${escapeHtml(tag)}</span>`).join("")}</div>
       <button class="small" data-action="load-version" data-version-id="${escapeAttr(version.id)}" type="button">载入</button>
@@ -573,6 +584,17 @@ function buildVersionDisplayTitle(version, index) {
   return `${title}｜${formatCompactTime(version.created_at)}｜#${String(index + 1).padStart(2, "0")}`;
 }
 
+function buildSaveTargetTitle() {
+  const active = findVersionById(state.currentVersionId);
+  if (active) return active.title || "当前版本";
+  return buildNextVersionTitle();
+}
+
+function findVersionById(versionId) {
+  if (!versionId) return null;
+  return (state.library?.versions || []).find((version) => version.id === versionId) || null;
+}
+
 function buildNextVersionTitle() {
   const versions = state.library?.versions || [];
   const basics = state.data?.basics || {};
@@ -583,6 +605,12 @@ function buildNextVersionTitle() {
     .join("｜");
   const next = versions.length + 1;
   return `${prefix || "未命名简历"}｜${formatCompactNow()}｜v${String(next).padStart(2, "0")}`;
+}
+
+function formatVersionTimes(version) {
+  const created = formatTime(version.created_at);
+  const updated = version.updated_at ? formatTime(version.updated_at) : "";
+  return [created ? `创建 ${created}` : "", updated ? `更新 ${updated}` : ""].filter(Boolean).join(" / ");
 }
 
 function field(label, path, value, placeholder = "") {
@@ -715,6 +743,10 @@ function handleAction(action, dataset) {
   }
   if (action === "save-version") {
     saveVersion();
+    return;
+  }
+  if (action === "save-as-version") {
+    saveVersion({ asNew: true });
     return;
   }
   if (action === "load-version") {
@@ -958,6 +990,9 @@ async function loadLibrary() {
   const response = await fetch("/api/library");
   if (!response.ok) return;
   state.library = await response.json();
+  if (state.currentVersionId && !findVersionById(state.currentVersionId)) {
+    state.currentVersionId = "";
+  }
 }
 
 async function updateMaxVersions(value) {
@@ -979,13 +1014,17 @@ async function updateMaxVersions(value) {
   }
 }
 
-async function saveVersion() {
+async function saveVersion(options = {}) {
   if (state.busy) return;
+  const asNew = Boolean(options.asNew);
   state.busy = "save";
-  persist("保存版本中");
+  persist(asNew ? "另存版本中" : "保存版本中");
   renderTopbar();
   const form = buildResumeForm();
   form.append("title", state.versionTitle || "");
+  if (state.currentVersionId && !asNew) {
+    form.append("version_id", state.currentVersionId);
+  }
   const response = await fetch("/api/library/save", { method: "POST", body: form });
   const payload = await response.json();
   if (!response.ok) {
@@ -998,10 +1037,11 @@ async function saveVersion() {
   }
   state.library = payload.library;
   state.lastSavedTitle = payload.version?.title || "";
-  state.versionTitle = "";
+  state.currentVersionId = payload.version?.id || "";
+  if (asNew) state.versionTitle = "";
   state.section = "library";
   state.busy = "";
-  persist(state.lastSavedTitle ? `已保存：${state.lastSavedTitle}` : "版本已保存");
+  persist(state.lastSavedTitle ? `${asNew ? "已另存" : "已保存"}：${state.lastSavedTitle}` : "版本已保存");
   render();
 }
 
@@ -1017,6 +1057,7 @@ async function loadVersion(versionId) {
   state.jd = payload.jd || "";
   state.versionTitle = "";
   state.lastSavedTitle = payload.title || "";
+  state.currentVersionId = payload.id || versionId;
   state.photoFile = null;
   state.quality = { errors: [], warnings: [] };
   ensureShape();
@@ -1093,13 +1134,14 @@ function persist(label = "已保存") {
       jd: state.jd,
       versionTitle: state.versionTitle,
       lastSavedTitle: state.lastSavedTitle,
+      currentVersionId: state.currentVersionId,
     }),
   );
 }
 
 function renderNextVersionTitle() {
   const node = document.getElementById("nextVersionTitle");
-  if (node) node.textContent = buildNextVersionTitle();
+  if (node) node.textContent = buildSaveTargetTitle();
 }
 
 function formatCompactNow() {

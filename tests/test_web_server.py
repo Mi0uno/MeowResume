@@ -83,6 +83,22 @@ class WebServerTests(unittest.TestCase):
         self.assertIn("v01", first["title"])
         self.assertIn("v02", second["title"])
 
+    def test_update_resume_version_edits_existing_version_without_new_history_item(self):
+        data = rg.load_resume_data(Path("candidate.example.json"))
+
+        with tempfile.TemporaryDirectory() as tmp:
+            library_path = Path(tmp) / "library.json"
+            saved = web_server.save_resume_version(data, "JD A", library_path=library_path)
+            data["basics"]["target_role"] = "安全研发工程师"
+            updated = web_server.update_resume_version(saved["id"], data, "JD B", library_path=library_path)
+            library = web_server.load_library(library_path)
+
+        self.assertEqual(saved["id"], updated["id"])
+        self.assertEqual(len(library["versions"]), 1)
+        self.assertEqual(library["versions"][0]["data"]["basics"]["target_role"], "安全研发工程师")
+        self.assertEqual(library["versions"][0]["jd"], "JD B")
+        self.assertTrue(library["versions"][0]["updated_at"])
+
     def test_max_versions_prunes_oldest_versions(self):
         data = rg.load_resume_data(Path("candidate.example.json"))
 
