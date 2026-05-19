@@ -78,7 +78,8 @@ const sampleData = {
 let state = {
   section: "basics",
   data: readJson("meowresume-draft", sampleData),
-  versions: readJson("meowresume-versions", []),
+  versions: normalizeVersions(readJson("meowresume-versions", [])),
+  activeVersionId: localStorage.getItem("meowresume-active-version-id") || "",
   maxVersions: Number(localStorage.getItem("meowresume-max") || 30),
 };
 
@@ -89,10 +90,12 @@ const statusText = document.getElementById("statusText");
 
 document.getElementById("loadSampleBtn").addEventListener("click", () => {
   state.data = structuredClone(sampleData);
+  state.activeVersionId = "";
   persistDraft("已载入示例");
   render();
 });
 document.getElementById("saveBtn").addEventListener("click", saveVersion);
+document.getElementById("saveAsBtn").addEventListener("click", saveAsVersion);
 document.getElementById("exportJsonBtn").addEventListener("click", exportJson);
 document.getElementById("importJsonInput").addEventListener("change", importJson);
 document.getElementById("generateBtn").addEventListener("click", generateWord);
@@ -270,21 +273,26 @@ function renderCertifications() {
 
 function renderLibrary() {
   const versions = state.versions || [];
+  const activeVersion = findActiveVersion();
   return `
-    ${sectionHead("简历库", `<button data-action="clear-versions" type="button">清空历史</button>`)}
+    ${sectionHead("简历库", `<button data-action="save-as-version" type="button">另存为新版本</button><button data-action="clear-versions" type="button">清空历史</button>`)}
+    <div class="save-preview">
+      <span>当前编辑</span>
+      <strong>${escapeHtml(activeVersion ? activeVersion.title : "未保存草稿")}</strong>
+    </div>
     <div class="form-grid">
       ${field("最大留存数量", "maxVersions", state.maxVersions)}
     </div>
-    <p class="hint">历史版本保存在当前浏览器，不会同步到 GitHub。换浏览器或清理站点数据后会消失。</p>
+    <p class="hint">点“保存当前版本”会更新当前编辑版本；点“另存为新版本”才会新增历史。历史版本保存在当前浏览器，不会同步到 GitHub。</p>
     <div class="version-list">
       ${
         versions
           .map(
             (version, index) => `
-          <div class="version-item">
+          <div class="version-item ${version.id === state.activeVersionId ? "active" : ""}">
             <div>
-              <strong>${escapeHtml(version.title)}</strong>
-              <span>${escapeHtml(version.created_at)}</span>
+              <strong>${escapeHtml(version.title)}${version.id === state.activeVersionId ? "（正在编辑）" : ""}</strong>
+              <span>${escapeHtml([`创建 ${version.created_at}`, version.updated_at ? `更新 ${version.updated_at}` : ""].filter(Boolean).join(" · "))}</span>
             </div>
             <button data-action="load-version" data-index="${index}" type="button">载入</button>
           </div>`,
@@ -314,13 +322,21 @@ function handleAction(dataset) {
   if (action === "remove-entry") state.data[dataset.key].splice(Number(dataset.index), 1);
   if (action === "add-skill") addSkill();
   if (action === "remove-skill") delete state.data.skills[dataset.key];
+  if (action === "save-as-version") {
+    saveAsVersion();
+    return;
+  }
   if (action === "load-version") {
-    state.data = structuredClone(state.versions[Number(dataset.index)].data);
+    const version = state.versions[Number(dataset.index)];
+    state.data = structuredClone(version.data);
+    state.activeVersionId = version.id;
     ensureShape();
   }
   if (action === "clear-versions" && confirm("确定清空当前浏览器里的历史版本吗？")) {
     state.versions = [];
+    state.activeVersionId = "";
     localStorage.setItem("meowresume-versions", "[]");
+    localStorage.removeItem("meowresume-active-version-id");
   }
   persistDraft("已更新");
   render();
@@ -733,21 +749,53 @@ function concatBytes(parts) {
 }
 
 function saveVersion() {
-  const title = buildVersionTitle();
-  state.versions.unshift({
-    title,
+  const existing = findActiveVersion();
+  if (existing) {
+    existing.data = structuredClone(state.data);
+    existing.updated_at = new Date().toLocaleString();
+    existing.title ||= buildVersionTitle(existing);
+    state.versions = [existing, ...state.versions.filter((version) => version.id !== existing.id)];
+    persistVersions();
+    persistDraft(`已更新：${existing.title}`);
+    if (state.section === "library") render();
+    return;
+  }
+  saveAsVersion();
+}
+
+function saveAsVersion() {
+  const version = {
+    id: buildVersionId(),
+    title: buildVersionTitle(),
     created_at: new Date().toLocaleString(),
+    updated_at: "",
     data: structuredClone(state.data),
-  });
+  };
+  state.versions.unshift(version);
+  state.activeVersionId = version.id;
   pruneVersions();
-  localStorage.setItem("meowresume-versions", JSON.stringify(state.versions));
-  setStatus(`已保存：${title}`);
-  if (state.section === "library") render();
+  persistVersions();
+  persistDraft(`已另存：${version.title}`);
+  render();
 }
 
 function pruneVersions() {
   state.versions = state.versions.slice(0, state.maxVersions);
+  if (state.activeVersionId && !findActiveVersion()) state.activeVersionId = "";
+  persistVersions();
+}
+
+function persistVersions() {
   localStorage.setItem("meowresume-versions", JSON.stringify(state.versions));
+  if (state.activeVersionId) {
+    localStorage.setItem("meowresume-active-version-id", state.activeVersionId);
+  } else {
+    localStorage.removeItem("meowresume-active-version-id");
+  }
+}
+
+function findActiveVersion() {
+  return state.versions.find((version) => version.id === state.activeVersionId);
 }
 
 function exportJson() {
@@ -763,6 +811,7 @@ async function importJson(event) {
   const text = await file.text();
   const payload = JSON.parse(text);
   state.data = payload.data || payload;
+  state.activeVersionId = "";
   ensureShape();
   persistDraft("已导入 JSON");
   render();
@@ -771,6 +820,11 @@ async function importJson(event) {
 
 function persistDraft(message) {
   localStorage.setItem("meowresume-draft", JSON.stringify(state.data));
+  if (state.activeVersionId) {
+    localStorage.setItem("meowresume-active-version-id", state.activeVersionId);
+  } else {
+    localStorage.removeItem("meowresume-active-version-id");
+  }
   setStatus(message);
 }
 
@@ -778,10 +832,26 @@ function setStatus(message) {
   statusText.textContent = `${message} · ${new Date().toLocaleTimeString()}`;
 }
 
-function buildVersionTitle() {
+function buildVersionTitle(existing = null) {
   const basics = state.data.basics || {};
-  const count = state.versions.length + 1;
+  const count = existing
+    ? Math.max(1, state.versions.findIndex((version) => version.id === existing.id) + 1)
+    : state.versions.length + 1;
   return `${basics.name || "未命名"}｜${basics.target_role || "简历"}｜v${String(count).padStart(2, "0")}`;
+}
+
+function buildVersionId() {
+  return `${Date.now().toString(36)}_${Math.random().toString(16).slice(2, 10)}`;
+}
+
+function normalizeVersions(versions) {
+  return (versions || []).map((version, index) => ({
+    id: version.id || `legacy_${index}_${Date.now().toString(36)}`,
+    title: version.title || `未命名版本｜v${String(index + 1).padStart(2, "0")}`,
+    created_at: version.created_at || "",
+    updated_at: version.updated_at || "",
+    data: version.data || structuredClone(sampleData),
+  }));
 }
 
 function buildFilename(data) {

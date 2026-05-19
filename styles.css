@@ -243,6 +243,25 @@ select:focus {
   line-height: 1.5;
 }
 
+.save-preview {
+  display: grid;
+  gap: 4px;
+  border: 1px solid #cfe0d7;
+  background: #f7fbf9;
+  border-radius: 7px;
+  padding: 10px;
+  margin-bottom: 12px;
+}
+
+.save-preview span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.save-preview strong {
+  overflow-wrap: anywhere;
+}
+
 .version-list {
   display: grid;
   gap: 8px;
@@ -257,6 +276,11 @@ select:focus {
   border-radius: 7px;
   padding: 10px;
   background: #fff;
+}
+
+.version-item.active {
+  border-color: #9bcdb6;
+  background: #f4fbf7;
 }
 
 .version-item strong,
