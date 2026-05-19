@@ -9,7 +9,7 @@ _填写结构化内容，预览标准简历版式，一键生成 ATS 友好的 `
 ![Local First](https://img.shields.io/badge/Local--first-No%20cloud%20upload-2ea44f?style=flat-square)
 ![Tests](https://img.shields.io/badge/tests-unittest-brightgreen?style=flat-square)
 
-[在线使用](https://mi0uno.github.io/MeowResume/) · [本地运行](#本地运行) · [数据结构](#数据结构) · [本地-api](#本地-api)
+[项目主页](https://mi0uno.github.io/MeowResume/) · [在线使用](https://mi0uno.github.io/MeowResume/app.html) · [本地运行](#本地运行) · [数据结构](#数据结构)
 
 ## 项目概述
 
@@ -54,10 +54,16 @@ Word 输出遵循保守、清晰、可解析的中文校招简历格式：A4 页
 
 ## 在线直接使用
 
-打开 GitHub Pages：
+先打开项目主页了解功能与隐私说明：
 
 ```text
 https://mi0uno.github.io/MeowResume/
+```
+
+点击页面里的 `在线使用`，或直接打开：
+
+```text
+https://mi0uno.github.io/MeowResume/app.html
 ```
 
 在线版能力：

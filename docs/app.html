@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MeowResume - 在线简历生成器</title>
+    <meta
+      name="description"
+      content="MeowResume 是一个浏览器本地运行的中文简历生成器，填写内容即可直接生成 Word 简历。"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <strong>MeowResume</strong>
+          <span id="statusText">所有内容只保存在你的浏览器里</span>
+        </div>
+        <div class="top-actions">
+          <a class="ghost link-button" href="./">项目介绍</a>
+          <button class="ghost" id="loadSampleBtn" type="button">载入示例</button>
+          <button class="ghost" id="saveBtn" type="button">保存版本</button>
+          <button class="ghost" id="exportJsonBtn" type="button">导出 JSON</button>
+          <label class="ghost file-button">
+            导入 JSON
+            <input id="importJsonInput" type="file" accept="application/json,.json" />
+          </label>
+          <button class="primary" id="generateBtn" type="button">生成 Word</button>
+        </div>
+      </header>
+
+      <main class="workspace">
+        <aside class="nav" id="sectionNav" aria-label="编辑模块"></aside>
+        <section class="editor" id="editor" aria-label="内容编辑"></section>
+        <aside class="preview-pane" aria-label="简历预览">
+          <div class="privacy-note">
+            <strong>隐私模式</strong>
+            <span>页面不上传数据；版本库使用 localStorage，清浏览器数据会删除历史版本。</span>
+          </div>
+          <article class="resume-paper" id="preview"></article>
+        </aside>
+      </main>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
