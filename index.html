@@ -3,378 +3,45 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>MeowResume - 应届生大厂简历 Word 生成器</title>
+    <title>MeowResume - 在线简历生成器</title>
     <meta
       name="description"
-      content="MeowResume 是一个本地优先的中文简历生成器，填写结构化内容即可生成 ATS 友好的 Word 简历。"
+      content="MeowResume 是一个浏览器本地运行的中文简历生成器，填写内容即可直接生成 Word 简历。"
     />
-    <style>
-      :root {
-        --bg: #f6f7f9;
-        --ink: #17201b;
-        --muted: #5b6761;
-        --line: #d8ddd9;
-        --panel: #ffffff;
-        --accent: #167a55;
-        --accent-strong: #0f5e41;
-        --soft: #eaf5ef;
-        --shadow: 0 18px 45px rgba(20, 38, 30, 0.08);
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      body {
-        margin: 0;
-        font-family: "Microsoft YaHei", "PingFang SC", "Noto Sans SC", Arial, sans-serif;
-        color: var(--ink);
-        background: var(--bg);
-        line-height: 1.6;
-      }
-
-      a {
-        color: inherit;
-      }
-
-      .wrap {
-        width: min(1120px, calc(100% - 36px));
-        margin: 0 auto;
-      }
-
-      .top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 20px 0;
-      }
-
-      .logo {
-        font-weight: 800;
-        letter-spacing: 0;
-        font-size: 20px;
-      }
-
-      .nav {
-        display: flex;
-        gap: 16px;
-        color: var(--muted);
-        font-size: 14px;
-      }
-
-      .nav a {
-        text-decoration: none;
-      }
-
-      .hero {
-        min-height: 560px;
-        display: grid;
-        grid-template-columns: minmax(0, 0.95fr) minmax(340px, 1.05fr);
-        gap: 36px;
-        align-items: center;
-        padding: 34px 0 56px;
-      }
-
-      .eyebrow {
-        display: inline-flex;
-        border: 1px solid #c8d8cf;
-        background: var(--soft);
-        color: var(--accent-strong);
-        border-radius: 999px;
-        padding: 5px 12px;
-        font-size: 13px;
-        font-weight: 700;
-      }
-
-      h1 {
-        margin: 18px 0 16px;
-        font-size: clamp(38px, 5vw, 68px);
-        line-height: 1.02;
-        letter-spacing: 0;
-      }
-
-      .lead {
-        margin: 0;
-        color: var(--muted);
-        font-size: 18px;
-        max-width: 650px;
-      }
-
-      .actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        margin-top: 28px;
-      }
-
-      .btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        min-height: 42px;
-        padding: 0 16px;
-        border-radius: 6px;
-        border: 1px solid var(--line);
-        text-decoration: none;
-        font-weight: 700;
-        background: var(--panel);
-      }
-
-      .btn.primary {
-        background: var(--accent);
-        border-color: var(--accent);
-        color: #fff;
-      }
-
-      .preview {
-        background: var(--panel);
-        border: 1px solid var(--line);
-        box-shadow: var(--shadow);
-        padding: 28px;
-        min-height: 460px;
-      }
-
-      .paper-head {
-        display: flex;
-        justify-content: space-between;
-        gap: 20px;
-        align-items: flex-start;
-        border-bottom: 2px solid #202923;
-        padding-bottom: 14px;
-      }
-
-      .paper-head strong {
-        font-size: 30px;
-        display: block;
-      }
-
-      .paper-head span,
-      .paper p,
-      .paper li {
-        color: var(--muted);
-      }
-
-      .photo {
-        width: 76px;
-        height: 100px;
-        border: 1px solid #b9c2bd;
-        display: grid;
-        place-items: center;
-        color: var(--muted);
-        font-size: 12px;
-      }
-
-      .paper h2 {
-        font-size: 15px;
-        border-bottom: 1px solid #8b9691;
-        padding-bottom: 4px;
-        margin: 18px 0 8px;
-      }
-
-      .row {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) max-content;
-        gap: 18px;
-        font-weight: 700;
-        font-size: 14px;
-      }
-
-      .row span:last-child {
-        color: var(--muted);
-        font-weight: 500;
-      }
-
-      .paper ul {
-        margin: 6px 0 0 20px;
-        padding: 0;
-      }
-
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 14px;
-        padding: 34px 0;
-      }
-
-      .card {
-        background: var(--panel);
-        border: 1px solid var(--line);
-        border-radius: 8px;
-        padding: 18px;
-      }
-
-      .card h3 {
-        margin: 0 0 8px;
-        font-size: 17px;
-      }
-
-      .card p {
-        margin: 0;
-        color: var(--muted);
-        font-size: 14px;
-      }
-
-      .section {
-        padding: 36px 0 58px;
-      }
-
-      .section h2 {
-        margin: 0 0 14px;
-        font-size: 30px;
-      }
-
-      .commands {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 16px;
-      }
-
-      pre {
-        margin: 0;
-        overflow: auto;
-        background: #111a15;
-        color: #e8f5ee;
-        border-radius: 8px;
-        padding: 16px;
-        font-size: 13px;
-      }
-
-      .privacy {
-        background: #fff8e8;
-        border: 1px solid #ead8a8;
-        border-radius: 8px;
-        padding: 16px;
-        color: #514011;
-      }
-
-      footer {
-        border-top: 1px solid var(--line);
-        padding: 24px 0 36px;
-        color: var(--muted);
-        font-size: 14px;
-      }
-
-      @media (max-width: 860px) {
-        .top,
-        .nav,
-        .actions {
-          align-items: flex-start;
-        }
-
-        .top {
-          gap: 12px;
-          flex-direction: column;
-        }
-
-        .hero,
-        .grid,
-        .commands {
-          grid-template-columns: 1fr;
-        }
-
-        .hero {
-          min-height: 0;
-          padding-top: 20px;
-        }
-
-        .preview {
-          padding: 18px;
-        }
-      }
-    </style>
+    <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <header class="wrap top">
-      <div class="logo">MeowResume</div>
-      <nav class="nav" aria-label="页面导航">
-        <a href="#features">功能</a>
-        <a href="#start">快速开始</a>
-        <a href="https://github.com/Mi0uno/MeowResume">GitHub</a>
-      </nav>
-    </header>
-
-    <main>
-      <section class="wrap hero">
-        <div>
-          <span class="eyebrow">本地优先 · Word 导出 · 中文校招简历</span>
-          <h1>MeowResume</h1>
-          <p class="lead">
-            面向应届生技术岗和网络安全岗的简历生成器。填写结构化内容，实时预览标准简历版式，一键生成 ATS 友好的 Word 简历。
-          </p>
-          <div class="actions">
-            <a class="btn primary" href="https://github.com/Mi0uno/MeowResume">查看源码</a>
-            <a class="btn" href="#start">本地运行</a>
-          </div>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <strong>MeowResume</strong>
+          <span id="statusText">所有内容只保存在你的浏览器里</span>
         </div>
-
-        <div class="preview paper" aria-label="简历效果示意">
-          <div class="paper-head">
-            <div>
-              <strong>张三</strong>
-              <span>后端开发工程师 · 北京 · zhangsan@example.com</span>
-            </div>
-            <div class="photo">证件照</div>
-          </div>
-
-          <h2>教育经历</h2>
-          <div class="row">
-            <span>清华大学 · 计算机科学与技术 · 本科</span>
-            <span>2022.09 - 2026.06</span>
-          </div>
-
-          <h2>项目&科研经历</h2>
-          <div class="row">
-            <span>校园二手交易平台 · 后端负责人 · FastAPI / MySQL / Redis</span>
-            <span>2025.03 - 2025.06</span>
-          </div>
-          <ul>
-            <li>主导商品、搜索、订单和消息模块设计，支撑 1200+ 名校内用户使用。</li>
-            <li>引入 Redis 缓存热门商品，首页接口平均响应时间从 310ms 降至 95ms。</li>
-          </ul>
-
-          <h2>竞赛获奖</h2>
-          <div class="row">
-            <span>全国大学生信息安全竞赛区域赛</span>
-            <span>二等奖 · 2025</span>
-          </div>
+        <div class="top-actions">
+          <button class="ghost" id="loadSampleBtn" type="button">载入示例</button>
+          <button class="ghost" id="saveBtn" type="button">保存版本</button>
+          <button class="ghost" id="exportJsonBtn" type="button">导出 JSON</button>
+          <label class="ghost file-button">
+            导入 JSON
+            <input id="importJsonInput" type="file" accept="application/json,.json" />
+          </label>
+          <button class="primary" id="generateBtn" type="button">生成 Word</button>
         </div>
-      </section>
+      </header>
 
-      <section class="wrap grid" id="features">
-        <article class="card">
-          <h3>结构化填写</h3>
-          <p>基础信息、教育经历、实习、项目、竞赛、证书按模块维护，不再反复调 Word 格式。</p>
-        </article>
-        <article class="card">
-          <h3>严格 Word 格式</h3>
-          <p>输出 A4 单栏、紧凑行距、标题分隔线和左右对齐奖项，适合校招投递。</p>
-        </article>
-        <article class="card">
-          <h3>版本留存</h3>
-          <p>每次保存自动生成新版本名，支持设置最大留存数量，方便为不同岗位维护不同版本。</p>
-        </article>
-      </section>
+      <main class="workspace">
+        <aside class="nav" id="sectionNav" aria-label="编辑模块"></aside>
+        <section class="editor" id="editor" aria-label="内容编辑"></section>
+        <aside class="preview-pane" aria-label="简历预览">
+          <div class="privacy-note">
+            <strong>隐私模式</strong>
+            <span>页面不上传数据；版本库使用 localStorage，清浏览器数据会删除历史版本。</span>
+          </div>
+          <article class="resume-paper" id="preview"></article>
+        </aside>
+      </main>
+    </div>
 
-      <section class="wrap section" id="start">
-        <h2>快速开始</h2>
-        <div class="commands">
-          <pre><code>pip install -r requirements.txt
-python web_server.py</code></pre>
-          <pre><code>python resume_generator.py --data candidate.example.json
-python resume_generator.py --data candidate.example.json --no-photo</code></pre>
-        </div>
-      </section>
-
-      <section class="wrap section">
-        <div class="privacy">
-          <strong>隐私说明：</strong>
-          MeowResume 设计为本地运行。真实简历、证件照、简历库和导出的 Word 文件不需要上传到 GitHub；公开仓库只保留代码、文档和示例数据。
-        </div>
-      </section>
-    </main>
-
-    <footer class="wrap">
-      © 2026 MeowResume. Built for local-first resume writing.
-    </footer>
+    <script src="./app.js"></script>
   </body>
 </html>
